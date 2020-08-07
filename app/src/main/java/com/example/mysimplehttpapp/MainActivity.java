@@ -35,7 +35,7 @@ import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
-    ArrayList<EarthQuake> earthQuakeArrayList;
+    ArrayList<EarthQuake> earthQuakeArrayList = new ArrayList<>();
     MyAdapter rvAdapter; // is needed as global for postExecute method
 
     @Override
@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //////
+        /*//////
         try {
             jsonObject = new JSONObject(jsonString);
         } catch (JSONException e) {
@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         }catch (JSONException e){
             Log.d("JARRAY", "exception at array creation");
             e.printStackTrace();
-        }
+        }*/
         /////////////
         RecyclerView rv = (RecyclerView) findViewById(R.id.recycler_view);
         rvAdapter = new MyAdapter();
@@ -121,6 +121,27 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String jsonResponse) {
+
+            //we will parse the JSON into the eartchquake list
+            JSONArray responseArray;
+            try {
+                JSONObject root = new JSONObject(jsonResponse);
+                responseArray = root.getJSONArray("features");
+
+                for (int i = 0; i<responseArray.length(); i++){
+                    JSONObject currentEQ = responseArray.getJSONObject(i).getJSONObject("properties");
+                    earthQuakeArrayList.add(new EarthQuake(
+                            currentEQ.getString("place"),
+                            currentEQ.getLong("time"),
+                            currentEQ.getDouble("mag")));
+                }
+
+                rvAdapter.notifyDataSetChanged();
+                //to tell the rv that our data source was modified
+
+            }catch (JSONException exception){
+                Toast.makeText(MainActivity.this, "PARSing failed", Toast.LENGTH_SHORT).show();
+            }
             super.onPostExecute(jsonResponse);
         }
     }
@@ -135,77 +156,67 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            try {
-                JSONObject featureObject = jsonArray.getJSONObject(position);
-                JSONObject propertiesObject = featureObject.getJSONObject("properties");
 
-                //// Handling date
-                long date = propertiesObject.getLong("time");
-                SimpleDateFormat dateFormat = new SimpleDateFormat("MMM DD, yyyy\n hh:mm a");
-                String formattedDate = dateFormat.format(new Date(date));
-                holder.dateTextView.setText(formattedDate);
+            //// Handling date
+            long date = earthQuakeArrayList.get(position).getDate();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MMM DD, yyyy\n hh:mm a");
+            String formattedDate = dateFormat.format(new Date(date));
+            holder.dateTextView.setText(formattedDate);
 
-                /////// String stuff
-                String [] locationAndDistance = propertiesObject.getString("place").split("of");
-                if(locationAndDistance.length == 1){
-                    holder.locTextView.setText(locationAndDistance[0]);
-                    holder.distTetView.setText("");
-                }else{
-                    holder.distTetView.setText(locationAndDistance[0]+"of");
-                    holder.locTextView.setText(locationAndDistance[1]);
-                }
-
-                //decimal stuff
-                double mag = propertiesObject.getDouble("mag");
-                DecimalFormat decimalFormat = new DecimalFormat("0.0");
-                String formattedMag = decimalFormat.format(mag);
-                holder.magTextView.setText(formattedMag);
-
-                ///color stuff
-                GradientDrawable gradientDrawable = (GradientDrawable) holder.magTextView.getBackground();
-                int color;
-                switch((int) mag){
-                    case 1:
-                        color = R.color.magnitude1;
-                        break;
-                    case 2:
-                        color = R.color.magnitude2;
-                        break;
-                    case 3:
-                        color = R.color.magnitude3;
-                        break;
-                    case 4:
-                        color = R.color.magnitude4;
-                        break;
-                    case 5:
-                        color = R.color.magnitude5;
-                        break;
-                    case 6:
-                        color = R.color.magnitude6;
-                        break;
-                    case 7:
-                        color = R.color.magnitude7;
-                        break;
-                    case 8:
-                        color = R.color.magnitude8;
-                        break;
-                    case 9:
-                        color = R.color.magnitude9;
-                        break;
-                    case 10:
-                        color = R.color.magnitude10plus;
-                        break;
-                    default:
-                        color = R.color.magnitude10plus;
-                }
-                gradientDrawable.setColor(getResources().getColor(color));
-
-            }catch (JSONException e){
-                Toast.makeText(MainActivity.this, "nope", Toast.LENGTH_SHORT).show();
-                e.printStackTrace();
+            /////// String stuff
+            String [] locationAndDistance = earthQuakeArrayList.get(position).getDistance_loc().split("of");
+            if(locationAndDistance.length == 1){
+                holder.locTextView.setText(locationAndDistance[0]);
+                holder.distTetView.setText("");
+            }else{
+                holder.distTetView.setText(locationAndDistance[0]+"of");
+                holder.locTextView.setText(locationAndDistance[1]);
             }
 
+            //decimal stuff
+            double mag = earthQuakeArrayList.get(position).getMagnitude();
+            DecimalFormat decimalFormat = new DecimalFormat("0.0");
+            String formattedMag = decimalFormat.format(mag);
+            holder.magTextView.setText(formattedMag);
 
+            ///color stuff
+            GradientDrawable gradientDrawable = (GradientDrawable) holder.magTextView.getBackground();
+            int color;
+            switch((int) mag){
+                case 1:
+                    color = R.color.magnitude1;
+                    break;
+                case 2:
+                    color = R.color.magnitude2;
+                    break;
+                case 3:
+                    color = R.color.magnitude3;
+                    break;
+                case 4:
+                    color = R.color.magnitude4;
+                    break;
+                case 5:
+                    color = R.color.magnitude5;
+                    break;
+                case 6:
+                    color = R.color.magnitude6;
+                    break;
+                case 7:
+                    color = R.color.magnitude7;
+                    break;
+                case 8:
+                    color = R.color.magnitude8;
+                    break;
+                case 9:
+                    color = R.color.magnitude9;
+                    break;
+                case 10:
+                    color = R.color.magnitude10plus;
+                    break;
+                default:
+                    color = R.color.magnitude10plus;
+            }
+            gradientDrawable.setColor(getResources().getColor(color));
         }
 
         @Override

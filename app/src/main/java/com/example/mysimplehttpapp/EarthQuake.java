@@ -5,6 +5,12 @@ public class EarthQuake {
     long date;
     double magnitude;
 
+    public EarthQuake(String distance_loc, long date, double magnitude) {
+        this.distance_loc = distance_loc;
+        this.date = date;
+        this.magnitude = magnitude;
+    }
+
     public String getDistance_loc() {
         return distance_loc;
     }

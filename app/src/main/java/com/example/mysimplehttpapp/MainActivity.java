@@ -37,32 +37,25 @@ public class MainActivity extends AppCompatActivity {
 
     ArrayList<EarthQuake> earthQuakeArrayList = new ArrayList<>();
     MyAdapter rvAdapter; // is needed as global for postExecute method
+    String query = "https://earthquake.usgs.gov/fdsnws/event/1/query?f" +
+            "ormat=geojson&starttime=2014-01-01&endtime=2014-01-02";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        /*//////
-        try {
-            jsonObject = new JSONObject(jsonString);
-        } catch (JSONException e) {
-            Log.d("JOBJECT", "exception at object creation");
-            e.printStackTrace();
-        }
-
-        try {
-            jsonArray = jsonObject.getJSONArray("features");
-        }catch (JSONException e){
-            Log.d("JARRAY", "exception at array creation");
-            e.printStackTrace();
-        }*/
         /////////////
         RecyclerView rv = (RecyclerView) findViewById(R.id.recycler_view);
         rvAdapter = new MyAdapter();
         rv.setAdapter(rvAdapter);
         rv.setLayoutManager(new LinearLayoutManager(this));
         rv.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+
+        //////////// The Async thread initialization
+
+        EarthQuakeAsync earthQuakeAsync = new EarthQuakeAsync();
+        earthQuakeAsync.execute(query);
     }
 
     class EarthQuakeAsync extends AsyncTask<String, Void, String>{
@@ -164,10 +157,11 @@ public class MainActivity extends AppCompatActivity {
             holder.dateTextView.setText(formattedDate);
 
             /////// String stuff
-            String [] locationAndDistance = earthQuakeArrayList.get(position).getDistance_loc().split("of");
+            String [] locationAndDistance = earthQuakeArrayList.get(position).getDistance_loc().split("of ");
             if(locationAndDistance.length == 1){
                 holder.locTextView.setText(locationAndDistance[0]);
                 holder.distTetView.setText("");
+                holder.distTetView.setVisibility(View.GONE);
             }else{
                 holder.distTetView.setText(locationAndDistance[0]+"of");
                 holder.locTextView.setText(locationAndDistance[1]);

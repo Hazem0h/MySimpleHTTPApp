@@ -4,11 +4,21 @@ public class EarthQuake {
     String distance_loc;
     long date;
     double magnitude;
+    String earthquakeSpecificURL;
 
-    public EarthQuake(String distance_loc, long date, double magnitude) {
+    public String getEarthquakeSpecificURL() {
+        return earthquakeSpecificURL;
+    }
+
+    public void setEarthquakeSpecificURL(String earthquakeSpecificURL) {
+        this.earthquakeSpecificURL = earthquakeSpecificURL;
+    }
+
+    public EarthQuake(String distance_loc, long date, double magnitude, String url) {
         this.distance_loc = distance_loc;
         this.date = date;
         this.magnitude = magnitude;
+        this.earthquakeSpecificURL = url;
     }
 
     public String getDistance_loc() {

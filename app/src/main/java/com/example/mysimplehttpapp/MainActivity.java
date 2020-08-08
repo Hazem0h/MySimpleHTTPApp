@@ -1,12 +1,15 @@
 package com.example.mysimplehttpapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -126,7 +129,8 @@ public class MainActivity extends AppCompatActivity {
                     earthQuakeArrayList.add(new EarthQuake(
                             currentEQ.getString("place"),
                             currentEQ.getLong("time"),
-                            currentEQ.getDouble("mag")));
+                            currentEQ.getDouble("mag"),
+                            currentEQ.getString("url")));
                 }
 
                 rvAdapter.notifyDataSetChanged();
@@ -148,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
 
             //// Handling date
             long date = earthQuakeArrayList.get(position).getDate();
@@ -211,6 +215,17 @@ public class MainActivity extends AppCompatActivity {
                     color = R.color.magnitude10plus;
             }
             gradientDrawable.setColor(getResources().getColor(color));
+
+            /////The click listener
+            holder.frameLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Uri earthquakeUri = Uri.parse(earthQuakeArrayList.get(position).getEarthquakeSpecificURL());
+                    Intent websiteIntent = new Intent(Intent.ACTION_VIEW, earthquakeUri);
+
+                    startActivity(websiteIntent);
+                }
+            });
         }
 
         @Override
@@ -218,11 +233,19 @@ public class MainActivity extends AppCompatActivity {
             return earthQuakeArrayList.size();
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        earthQuakeArrayList.clear();
+        super.onDestroy();
+    }
+
     static class ViewHolder extends RecyclerView.ViewHolder{
         TextView dateTextView;
         TextView magTextView;
         TextView distTetView;
         TextView locTextView;
+        FrameLayout frameLayout;
         Context myContext;
         public ViewHolder(@NonNull View itemView, Context context) {
             super(itemView);
@@ -230,14 +253,8 @@ public class MainActivity extends AppCompatActivity {
             magTextView = (TextView) itemView.findViewById(R.id.magnitude_text_view);
             distTetView = (TextView) itemView.findViewById(R.id.distance_text_view);
             locTextView = (TextView) itemView.findViewById(R.id.location_text_view);
+            frameLayout = (FrameLayout) itemView.findViewById(R.id.frame_view);
             myContext = context;
-
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(myContext, "Clicked", Toast.LENGTH_SHORT).show();
-                }
-            });
         }
     }
 }

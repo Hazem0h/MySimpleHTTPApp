@@ -40,67 +40,9 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
 
-        //// Handling date
-        long date = earthQuakeArrayList.get(position).getDate();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM DD, yyyy\n hh:mm a");
-        String formattedDate = dateFormat.format(new Date(date));
-        holder.dateTextView.setText(formattedDate);
-
-        /////// String stuff
-        String [] locationAndDistance = earthQuakeArrayList.get(position).getDistance_loc().split("of ");
-        if(locationAndDistance.length == 1){
-            holder.locTextView.setText(locationAndDistance[0]);
-            holder.distTetView.setText("");
-            holder.distTetView.setVisibility(View.GONE);
-        }else{
-            holder.distTetView.setText(locationAndDistance[0]+"of");
-            holder.locTextView.setText(locationAndDistance[1]);
-        }
-
-        //decimal stuff
-        double mag = earthQuakeArrayList.get(position).getMagnitude();
-        DecimalFormat decimalFormat = new DecimalFormat("0.0");
-        String formattedMag = decimalFormat.format(mag);
-        holder.magTextView.setText(formattedMag);
-
-        ///color stuff
-        GradientDrawable gradientDrawable = (GradientDrawable) holder.magTextView.getBackground();
-        int color;
-        switch((int) mag){
-            case 1:
-                color = R.color.magnitude1;
-                break;
-            case 2:
-                color = R.color.magnitude2;
-                break;
-            case 3:
-                color = R.color.magnitude3;
-                break;
-            case 4:
-                color = R.color.magnitude4;
-                break;
-            case 5:
-                color = R.color.magnitude5;
-                break;
-            case 6:
-                color = R.color.magnitude6;
-                break;
-            case 7:
-                color = R.color.magnitude7;
-                break;
-            case 8:
-                color = R.color.magnitude8;
-                break;
-            case 9:
-                color = R.color.magnitude9;
-                break;
-            case 10:
-                color = R.color.magnitude10plus;
-                break;
-            default:
-                color = R.color.magnitude10plus;
-        }
-        gradientDrawable.setColor(myActivity.getResources().getColor(color));
+        //1-Binding the data to the UI
+        EarthQuake earthQuake = earthQuakeArrayList.get(position);
+        Utils.bindingLogic(earthQuake, holder, myActivity);
 
         /////The click listener
         holder.frameLayout.setOnClickListener(new View.OnClickListener() {
@@ -108,7 +50,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
             public void onClick(View v) {
                 Uri earthquakeUri = Uri.parse(earthQuakeArrayList.get(position).getEarthquakeSpecificURL());
                 Intent websiteIntent = new Intent(Intent.ACTION_VIEW, earthquakeUri);
-
                 myActivity.startActivity(websiteIntent);
             }
         });

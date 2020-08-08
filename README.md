@@ -6,5 +6,4 @@ Then we call notifyDataSetChanged() from the recycler view adapter <br>
 
 I followed the Udacity course in using the AsyncTask abstract class, as well as designing the layout of the list items. However, I used 
 a recycler view instead of a listview. <br>
-
-The feature that is missing is providing the functionality for clicking an item to open the browser on the selected earthquake on the USGS website. 
+ 
